@@ -1,9 +1,47 @@
+import { useEffect, useState } from 'react'
 import { useCreditCardContext } from '../hooks/useCreditCardContext'
+import { type CardInfoWithCVC } from '../types'
+import { onlyNumbers } from '../utils/utils'
 
 export const Form = () => {
   const { creditCard, setCreditCard } = useCreditCardContext()
   const { expiredDate, namePerson, numberCard, cvc } = creditCard
   const { month, year } = expiredDate
+
+  const initialCardInfo: CardInfoWithCVC = {
+    entity: '',
+    expiredDate: {
+      month: '',
+      year: ''
+    },
+    namePerson: '',
+    numberCard: '',
+    cvc: ''
+  }
+
+  const [error, setError] = useState<CardInfoWithCVC>(initialCardInfo)
+
+  useEffect(() => {
+    if (!onlyNumbers({ str: numberCard })) {
+      setError({
+        ...error,
+        numberCard: 'Wrong formant, only numbers'
+      })
+      return
+    }
+
+    if (cvc.length === 0) {
+      setError({
+        ...error,
+        cvc: "Don't be blank"
+      })
+      return
+    }
+
+    setError(initialCardInfo)
+  }, [creditCard])
+
+  console.log(error)
 
   const handleChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
     const name = evt.target.name
@@ -44,6 +82,9 @@ export const Form = () => {
         className="border-[1.5px] w-full px-4 py-2 rounded-md"
         onChange={handleChange}
       />
+      {error.namePerson.length > 0 && (
+        <p className="text-red-500 text-xs">{error.namePerson}</p>
+      )}
     </div>
 
     <div className="flex flex-col gap-2 grow">
@@ -61,6 +102,9 @@ export const Form = () => {
         maxLength={16}
         onChange={handleChange}
       />
+      {error.numberCard.length > 0 && (
+        <p className="text-red-500 text-xs">{error.numberCard}</p>
+      )}
     </div>
 
     <div className="flex gap-2 [&>div>label]:font-bold [&>div>label]:text-indigo-900 [&>div>div>input]:outline-indigo-900">

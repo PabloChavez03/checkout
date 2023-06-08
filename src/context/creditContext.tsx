@@ -26,14 +26,14 @@ interface Props {
 
 export const CreditCardProvider: React.FC<Props> = ({ children }) => {
   const [creditCard, setCreditCard] = useState<CardInfoWithCVC>({
-    entity: 'VISA',
+    entity: '',
     expiredDate: {
-      month: '01',
-      year: '01'
+      month: '',
+      year: ''
     },
-    cvc: '123',
-    numberCard: '0000000000000000',
-    namePerson: 'John Doe'
+    cvc: '',
+    numberCard: '',
+    namePerson: ''
   })
 
   return (
