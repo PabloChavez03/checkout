@@ -1,7 +1,11 @@
+import clsx from 'clsx'
 import { useEffect, useState } from 'react'
 import { useCreditCardContext } from '../hooks/useCreditCardContext'
 import { type CardInfoWithCVC } from '../types'
 import { onlyNumbers } from '../utils/utils'
+import { Icons } from './icons/Icons'
+
+// TODO: Faltan agregar los errores de los inputs
 
 export const Form = () => {
   const { creditCard, setCreditCard } = useCreditCardContext()
@@ -19,7 +23,9 @@ export const Form = () => {
     cvc: ''
   }
 
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<CardInfoWithCVC>(initialCardInfo)
+  const [submit, setSubmit] = useState(false)
 
   useEffect(() => {
     if (!onlyNumbers({ str: numberCard })) {
@@ -64,8 +70,23 @@ export const Form = () => {
     })
   }
 
+  const hasErrors = Object.values(error).some(value => value.length > 0)
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+    if (!hasErrors) {
+      setSubmit(true)
+      setTimeout(() => {
+        setCreditCard(initialCardInfo)
+        setLoading(false)
+        setSubmit(false)
+      }, 2000)
+    }
+  }
+
   return (
-    <form className="flex flex-col gap-6 px-8 [&>div>label]:font-bold [&>div>label]:text-indigo-900 [&>div>input]:outline-indigo-900">
+    <form className="flex flex-col gap-6 px-8 [&>div>label]:font-bold [&>div>label]:text-indigo-900 [&>div>input]:outline-indigo-900" onSubmit={handleSubmit}>
     <div className="flex flex-col gap-2 grow">
       <label
         htmlFor="cardholder-name"
@@ -153,7 +174,18 @@ export const Form = () => {
         />
       </div>
     </div>
-    <button className='bg-indigo-900 text-white py-3 rounded-md hover:bg-indigo-900/90 transition-colors'>Confirm</button>
+    <button className={clsx('text-white py-3 rounded-md  hover:bg-indigo-900/90 transition-colors', {
+      'bg-indigo-900': !submit,
+      'bg-indigo-900/80': submit
+    })}>{
+      submit
+        ? (
+        <div className='flex justify-center'>
+          <Icons.spin />
+        </div>
+          )
+        : 'Submit'
+    }</button>
   </form>
   )
 }
